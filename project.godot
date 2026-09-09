@@ -1,0 +1,32 @@
+; Pati Patni Ki Ladai - Godot 4 Android game
+; Original offline casual game with portrait-first UI.
+config_version=5
+
+[application]
+
+config/name="Pati Patni Ki Ladai"
+config/description="A funny, family-friendly Hindi cartoon game about choosing the right reply."
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.3", "GL Compatibility")
+config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=540
+window/size/viewport_height=960
+window/size/window_width_override=540
+window/size/window_height_override=960
+window/stretch/mode="canvas_items"
+window/handheld/orientation=1
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/default_filters/use_nearest_mipmap_filter=false
+environment/defaults/default_clear_color=Color(0.094, 0.082, 0.188, 1)
+
+[audio]
+
+default_bus_layout="res://default_bus_layout.tres"
+
