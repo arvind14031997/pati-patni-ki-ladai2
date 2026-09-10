@@ -39,7 +39,7 @@ jobs:
           mkdir -p build/android
           godot --headless --verbose \
             --path . \
-            --export-release "Android" \
+            --export-release "Android Release" \
             "build/android/${EXPORT_NAME}.apk"
 
       - name: Upload APK
