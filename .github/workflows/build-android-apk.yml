@@ -72,8 +72,8 @@ jobs:
           java -version
           test -d "$JAVA_HOME"
           test -d "$ANDROID_HOME"
-          test -d "$ANDROID_HOME/platforms/android-34"
-          test -d "$ANDROID_HOME/build-tools/34.0.0"
+          test -d "$ANDROID_HOME/platforms/android-33"
+          test -d "$ANDROID_HOME/build-tools/33.0.2"
           echo "Android SDK and Java are ready."
 
       - name: Check project
