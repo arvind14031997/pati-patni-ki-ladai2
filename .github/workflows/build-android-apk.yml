@@ -9,7 +9,9 @@ on:
 env:
   GODOT_VERSION: "4.3"
   EXPORT_NAME: "pati-patni-ki-ladai"
+  ANDROID_HOME: "/usr/lib/android-sdk"
   ANDROID_SDK_ROOT: "/usr/lib/android-sdk"
+  JAVA_HOME: "/usr/lib/jvm/java-17-openjdk-amd64"
 
 jobs:
   build-android:
@@ -20,6 +22,7 @@ jobs:
       image: barichello/godot-ci:4.3
 
     steps:
+
       - name: Checkout project
         uses: actions/checkout@v4
         with:
@@ -27,16 +30,11 @@ jobs:
 
       - name: Setup Android SDK
         run: |
-          export ANDROID_HOME=/usr/lib/android-sdk
-          export ANDROID_SDK_ROOT=/usr/lib/android-sdk
-
           yes | sdkmanager --licenses || true
-
           sdkmanager \
             "platform-tools" \
             "platforms;android-34" \
-            "build-tools;34.0.0" \
-            "cmdline-tools;latest"
+            "build-tools;34.0.0"
 
       - name: Setup Godot
         run: |
@@ -55,13 +53,27 @@ jobs:
           sed -i 's|export/android/android_sdk_path = ".*"|export/android/android_sdk_path = "/usr/lib/android-sdk"|g' \
             ~/.config/godot/editor_settings-4.3.tres
 
+      - name: Create debug keystore
+        run: |
+          mkdir -p build/keystore
+
+          keytool -genkeypair -v \
+            -keystore build/keystore/debug.keystore \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+
       - name: Check Android SDK and Java
         run: |
           java -version
-          test -d /usr/lib/jvm/java-17-openjdk-amd64
-          test -d /usr/lib/android-sdk
-          test -d /usr/lib/android-sdk/platforms/android-34
-          test -d /usr/lib/android-sdk/build-tools/34.0.0
+          test -d "$JAVA_HOME"
+          test -d "$ANDROID_HOME"
+          test -d "$ANDROID_HOME/platforms/android-34"
+          test -d "$ANDROID_HOME/build-tools/34.0.0"
           echo "Android SDK and Java are ready."
 
       - name: Check project
@@ -71,6 +83,10 @@ jobs:
       - name: Build Android APK
         run: |
           mkdir -p build/android
+
+          export GODOT_ANDROID_KEYSTORE_DEBUG_PATH="$GITHUB_WORKSPACE/build/keystore/debug.keystore"
+          export GODOT_ANDROID_KEYSTORE_DEBUG_USER="androiddebugkey"
+          export GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD="android"
 
           godot --headless --verbose \
             --path . \
