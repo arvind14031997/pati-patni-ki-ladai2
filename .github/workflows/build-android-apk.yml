@@ -25,16 +25,15 @@ jobs:
 
       - name: Checkout project
         uses: actions/checkout@v4
-        with:
-          lfs: true
-
+        
       - name: Setup Android SDK
         run: |
           yes | sdkmanager --licenses || true
           sdkmanager \
             "platform-tools" \
-            "platforms;android-34" \
-            "build-tools;34.0.0"
+            "platforms;android-33" \
+            "build-tools;33.0.2" \
+            "cmdline-tools;latest"
 
       - name: Setup Godot
         run: |
