@@ -24,11 +24,28 @@ jobs:
         with:
           lfs: true
 
-      - name: Setup Godot export templates
+      - name: Setup Godot
         run: |
           mkdir -p ~/.local/share/godot/export_templates
+          mkdir -p ~/.config/godot
+
+          mv /root/.config/godot ~/.config/godot
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable \
-             ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+            ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+          echo 'export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"' \
+            >> ~/.config/godot/editor_settings-4.3.tres
+
+          echo 'export/android/android_sdk_path = "/usr/lib/android-sdk"' \
+            >> ~/.config/godot/editor_settings-4.3.tres
+
+      - name: Check Android SDK and Java
+        run: |
+          java -version
+          echo "JAVA_HOME=$JAVA_HOME"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls -la /usr/lib/android-sdk
+          ls -la /usr/lib/jvm/java-17-openjdk-amd64
 
       - name: Check project
         run: |
@@ -37,10 +54,16 @@ jobs:
       - name: Build Android APK
         run: |
           mkdir -p build/android
+
           godot --headless --verbose \
             --path . \
             --export-release "Android Release" \
             "build/android/${EXPORT_NAME}.apk"
+
+      - name: Check APK
+        run: |
+          ls -lh build/android
+          test -f "build/android/${EXPORT_NAME}.apk"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
