@@ -9,6 +9,7 @@ on:
 env:
   GODOT_VERSION: "4.3"
   EXPORT_NAME: "pati-patni-ki-ladai"
+  ANDROID_SDK_ROOT: "/usr/lib/android-sdk"
 
 jobs:
   build-android:
@@ -24,16 +25,29 @@ jobs:
         with:
           lfs: true
 
+      - name: Setup Android SDK
+        run: |
+          export ANDROID_HOME=/usr/lib/android-sdk
+          export ANDROID_SDK_ROOT=/usr/lib/android-sdk
+
+          yes | sdkmanager --licenses || true
+
+          sdkmanager \
+            "platform-tools" \
+            "platforms;android-34" \
+            "build-tools;34.0.0" \
+            "cmdline-tools;latest"
+
       - name: Setup Godot
         run: |
           mkdir -p ~/.config/godot
           mkdir -p ~/.local/share/godot/export_templates
 
           cp /root/.config/godot/editor_settings-4.3.tres \
-             ~/.config/godot/editor_settings-4.3.tres
+            ~/.config/godot/editor_settings-4.3.tres
 
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable \
-             ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+            ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
 
           sed -i 's|export/android/java_sdk_path = ".*"|export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"|g' \
             ~/.config/godot/editor_settings-4.3.tres
@@ -46,8 +60,9 @@ jobs:
           java -version
           test -d /usr/lib/jvm/java-17-openjdk-amd64
           test -d /usr/lib/android-sdk
-          test -f /usr/lib/android-sdk/platform-tools/adb
-          echo "Java SDK and Android SDK found."
+          test -d /usr/lib/android-sdk/platforms/android-34
+          test -d /usr/lib/android-sdk/build-tools/34.0.0
+          echo "Android SDK and Java are ready."
 
       - name: Check project
         run: |
