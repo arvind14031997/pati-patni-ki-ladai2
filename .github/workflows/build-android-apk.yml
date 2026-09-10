@@ -66,7 +66,8 @@ jobs:
             -keysize 2048 \
             -validity 10000 \
             -dname "CN=Android Debug,O=Android,C=US"
-
+            
+          cp build/keystore/debug.keystore android_debug.keystore
       - name: Check Android SDK and Java
         run: |
           java -version
